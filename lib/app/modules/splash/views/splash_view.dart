@@ -10,7 +10,7 @@ class SplashView extends GetView<SplashController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.mainBackground,
+      backgroundColor: AppColors.secondaryColor,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -22,10 +22,10 @@ class SplashView extends GetView<SplashController> {
             ),
           ),
           SizedBox(
-              width: 150,
-              height: 150,
+              width: 300,
+              height: 300,
               child: Image.asset(
-                "assets/images/logo.png",
+                "assets/images/logo_white.png",
               )),
           Expanded(
             flex: 1,
@@ -38,7 +38,7 @@ class SplashView extends GetView<SplashController> {
               'powered by',
               style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.primaryBlack,
+                  color: AppColors.white,
                   fontWeight: FontWeight.w500),
             ),
           ),
@@ -47,7 +47,7 @@ class SplashView extends GetView<SplashController> {
               'SINDIKAT',
               style: TextStyle(
                   fontSize: 30,
-                  color: AppColors.primaryColor,
+                  color: AppColors.white,
                   fontWeight: FontWeight.bold),
             ),
           ),
