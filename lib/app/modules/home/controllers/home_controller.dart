@@ -24,14 +24,28 @@ class HomeController extends GetxController {
   }
 
   void _initSpeech() async {
-    bool available = await _speech.initialize(
-      onStatus: _onSpeechStatus,
-      onError: _onSpeechError,
-    );
-    if (available) {
-      isListening.value = true;
-      _startListening();
-    } else {
+    try {
+      bool available = await _speech.initialize(
+        onStatus: _onSpeechStatus,
+        onError: _onSpeechError,
+      );
+      if (available) {
+        isListening.value = true;
+        _startListening();
+      } else {
+        Flushbar(
+          title: 'Permission Denied',
+          titleColor: AppColors.white,
+          message: 'Please allow permission to use this feature.',
+          messageColor: AppColors.white,
+          duration: const Duration(seconds: 2),
+          backgroundColor: AppColors.primaryColor,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP,
+        ).show(Get.context!);
+      }
+    } catch (e) {
       Flushbar(
         title: 'Permission Denied',
         titleColor: AppColors.white,
@@ -75,6 +89,7 @@ class HomeController extends GetxController {
 
   void _onSpeechResult(String recognizedWords) {
     if (recognizedWords.toLowerCase().contains(triggerPhrase)) {
+      _speech.cancel();
       Get.offAllNamed(Routes.RECORD);
     }
   }

@@ -1,5 +1,9 @@
 import 'package:get/get.dart';
 
+import '../modules/alarm/bindings/alarm_binding.dart';
+import '../modules/alarm/views/alarm_view.dart';
+import '../modules/call_emergency/bindings/call_emergency_binding.dart';
+import '../modules/call_emergency/views/call_emergency_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -64,6 +68,16 @@ class AppPages {
       name: _Paths.RECORD,
       page: () => const RecordView(),
       binding: RecordBinding(),
+    ),
+    GetPage(
+      name: _Paths.CALL_EMERGENCY,
+      page: () => const CallEmergencyView(),
+      binding: CallEmergencyBinding(),
+    ),
+    GetPage(
+      name: _Paths.ALARM,
+      page: () => const AlarmView(),
+      binding: AlarmBinding(),
     ),
   ];
 }

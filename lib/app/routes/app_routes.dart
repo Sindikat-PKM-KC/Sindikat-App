@@ -11,6 +11,8 @@ abstract class Routes {
   static const REGISTER = _Paths.REGISTER;
   static const PLAYGROUND = _Paths.PLAYGROUND;
   static const RECORD = _Paths.RECORD;
+  static const CALL_EMERGENCY = _Paths.CALL_EMERGENCY;
+  static const ALARM = _Paths.ALARM;
 }
 
 abstract class _Paths {
@@ -23,4 +25,6 @@ abstract class _Paths {
   static const REGISTER = '/register';
   static const PLAYGROUND = '/playground';
   static const RECORD = '/record';
+  static const CALL_EMERGENCY = '/call-emergency';
+  static const ALARM = '/alarm';
 }
