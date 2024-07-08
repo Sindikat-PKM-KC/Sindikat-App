@@ -176,7 +176,7 @@ class LoginView extends GetView<LoginController> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    Container(
+                    SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                           style: ElevatedButton.styleFrom(

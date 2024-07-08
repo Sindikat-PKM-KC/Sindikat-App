@@ -7,6 +7,7 @@ import 'package:sindikat_app/app/constans/colors.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
 
 class EmergencyController extends GetxController {
+  var emergencyContact = Get.arguments;
   final contactFormKey = GlobalKey<FormState>();
   late TextEditingController penjaga1Controller,
       tlpPenjaga1Controller,
@@ -21,6 +22,7 @@ class EmergencyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print('Emergency Contact: $emergencyContact');
     penjaga1Controller = TextEditingController();
     tlpPenjaga1Controller = TextEditingController();
     penjaga2Controller = TextEditingController();
@@ -146,18 +148,33 @@ class EmergencyController extends GetxController {
     }
 
     if (isValid) {
-      Flushbar(
-        title: 'Success',
-        titleColor: AppColors.secondaryColor,
-        message: 'Contact saved successfully.',
-        messageColor: AppColors.secondaryColor,
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppColors.mainBackground,
-        margin: const EdgeInsets.all(8),
-        borderRadius: BorderRadius.circular(8),
-        flushbarPosition: FlushbarPosition.TOP,
-      ).show(Get.context!);
-      Get.offAllNamed(Routes.NAVBAR);
+      if (emergencyContact == null) {
+        Flushbar(
+          title: 'Success',
+          titleColor: AppColors.secondaryColor,
+          message: 'Contact saved successfully.',
+          messageColor: AppColors.secondaryColor,
+          duration: const Duration(seconds: 2),
+          backgroundColor: AppColors.mainBackground,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP,
+        ).show(Get.context!);
+        Get.offAllNamed(Routes.NAVBAR);
+      } else {
+        Flushbar(
+          title: 'Success',
+          titleColor: AppColors.secondaryColor,
+          message: 'Contact saved successfully.',
+          messageColor: AppColors.secondaryColor,
+          duration: const Duration(seconds: 2),
+          backgroundColor: AppColors.mainBackground,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP,
+        ).show(Get.context!);
+        Get.offNamed(Routes.NAVBAR, arguments: 1);
+      }
     } else {
       Flushbar(
         title: 'Error',
