@@ -8,6 +8,8 @@ import '../modules/navbar/bindings/navbar_binding.dart';
 import '../modules/navbar/views/navbar_view.dart';
 import '../modules/playground/bindings/playground_binding.dart';
 import '../modules/playground/views/playground_view.dart';
+import '../modules/record/bindings/record_binding.dart';
+import '../modules/record/views/record_view.dart';
 import '../modules/register/bindings/register_binding.dart';
 import '../modules/register/views/register_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
@@ -57,6 +59,11 @@ class AppPages {
       name: _Paths.PLAYGROUND,
       page: () => const PlaygroundView(),
       binding: PlaygroundBinding(),
+    ),
+    GetPage(
+      name: _Paths.RECORD,
+      page: () => const RecordView(),
+      binding: RecordBinding(),
     ),
   ];
 }
