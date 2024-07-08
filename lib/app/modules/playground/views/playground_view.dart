@@ -30,7 +30,7 @@ class PlaygroundView extends GetView<PlaygroundController> {
                         borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
-                    // controller.makePhoneCall("+62 821-4656-0178");
+                    controller.makePhoneCall("+62 821-4656-0178");
                     FocusScope.of(context).unfocus();
                   },
                   child: const Text("Call phone",
@@ -39,29 +39,29 @@ class PlaygroundView extends GetView<PlaygroundController> {
                           fontSize: 14,
                           fontWeight: FontWeight.bold))),
             ),
-            // SizedBox(
-            //   width: double.infinity,
-            //   child: ElevatedButton(
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: AppColors.primaryColor,
-            //       shape: RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.circular(8)),
-            //     ),
-            //     onPressed: () {
-            //       controller.determinePosition().then((value) {
-            //         controller.openGoogleMaps(value.latitude, value.longitude);
-            //       });
-            //       FocusScope.of(context).unfocus();
-            //     },
-            //     child: const Text(
-            //       "Get Possition",
-            //       style: TextStyle(
-            //           color: AppColors.white,
-            //           fontSize: 14,
-            //           fontWeight: FontWeight.bold),
-            //     ),
-            //   ),
-            // ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: () {
+                  controller.determinePosition().then((value) {
+                    controller.openGoogleMaps(value.latitude, value.longitude);
+                  });
+                  FocusScope.of(context).unfocus();
+                },
+                child: const Text(
+                  "Get Possition",
+                  style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
             // SizedBox(
             //   width: double.infinity,
             //   child: ElevatedButton(

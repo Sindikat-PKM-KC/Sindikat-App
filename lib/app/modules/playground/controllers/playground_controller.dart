@@ -16,13 +16,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:volume_controller/volume_controller.dart';
 
 class PlaygroundController extends GetxController {
-  // final count = 0.obs;
-  // var contactName = ''.obs;
-  // var contactPhone = ''.obs;
-  // final FlutterContactPicker _contactPicker = FlutterContactPicker();
-  // final AudioPlayer _audioPlayer = AudioPlayer();
-  // var isPlaying = false.obs;
-  // double originalVolume = 0.5;
+  final count = 0.obs;
+  var contactName = ''.obs;
+  var contactPhone = ''.obs;
+  final FlutterContactPicker _contactPicker = FlutterContactPicker();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  var isPlaying = false.obs;
+  double originalVolume = 0.5;
 
   // // Get Heart Rate
   // var devicesList = <BluetoothDevice>[].obs;
@@ -61,12 +61,12 @@ class PlaygroundController extends GetxController {
   //   super.onClose();
   // }
 
-  // Future<void> recordRequestPermissions() async {
-  //   await [
-  //     Permission.microphone,
-  //     Permission.storage,
-  //   ].request();
-  // }
+  Future<void> recordRequestPermissions() async {
+    await [
+      Permission.microphone,
+      Permission.storage,
+    ].request();
+  }
 
   // Future<bool> checkPermissions() async {
   //   var micStatus = await Permission.microphone.status;
@@ -185,13 +185,13 @@ class PlaygroundController extends GetxController {
 
   // void increment() => count.value++;
 
-  // Future<void> makePhoneCall(String phoneNumber) async {
-  //   try {
-  //     await FlutterPhoneDirectCaller.callNumber(phoneNumber);
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+  Future<void> makePhoneCall(String phoneNumber) async {
+    try {
+      await FlutterPhoneDirectCaller.callNumber(phoneNumber);
+    } catch (e) {
+      print(e);
+    }
+  }
 
   // void connectToAmazfitGTR() async {
   //   var bondedDevices = await FlutterBluePlus.bondedDevices;
@@ -272,42 +272,42 @@ class PlaygroundController extends GetxController {
   //   }
   // }
 
-  // Future<Position> determinePosition() async {
-  //   bool serviceEnabled;
-  //   LocationPermission permission;
+  Future<Position> determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     return Future.error('Location services are disabled.');
-  //   }
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
 
-  //   permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       return Future.error('Location permissions are denied');
-  //     }
-  //   }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
 
-  //   if (permission == LocationPermission.deniedForever) {
-  //     return Future.error(
-  //         'Location permissions are permanently denied, we cannot request permissions.');
-  //   }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
 
-  //   var value = await Geolocator.getCurrentPosition();
-  //   // _openGoogleMaps(value.latitude, value.longitude);
-  //   return value;
-  // }
+    var value = await Geolocator.getCurrentPosition();
+    // _openGoogleMaps(value.latitude, value.longitude);
+    return value;
+  }
 
-  // Future<void> openGoogleMaps(double lat, double lng) async {
-  //   final googleMapsUrl =
-  //       "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
-  //   try {
-  //     await launchUrl(Uri.parse(googleMapsUrl));
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+  Future<void> openGoogleMaps(double lat, double lng) async {
+    final googleMapsUrl =
+        "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
+    try {
+      await launchUrl(Uri.parse(googleMapsUrl));
+    } catch (e) {
+      print(e);
+    }
+  }
 
   // Future<void> _requestPermission() async {
   //   PermissionStatus status = await Permission.contacts.request();
