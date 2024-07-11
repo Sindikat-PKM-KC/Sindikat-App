@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
+import 'package:sindikat_app/app/constans/colors.dart';
 import 'package:sindikat_app/app/modules/register/views/emergency_contact_view.dart';
 import 'package:sindikat_app/app/modules/settings/views/devices_view.dart';
+import 'package:sindikat_app/app/routes/app_pages.dart';
 
 class SettingsController extends GetxController {
   var devicesList = <BluetoothDevice>[].obs;
@@ -9,6 +12,9 @@ class SettingsController extends GetxController {
   var connectedDevice = Rxn<BluetoothDevice>();
   var deviceServices = <BluetoothService>[].obs;
   var heartRate = 0.obs;
+
+  RxBool isLoading = false.obs;
+  var loadingDevice = Rxn<BluetoothDevice>();
 
   @override
   void onInit() {
@@ -26,13 +32,69 @@ class SettingsController extends GetxController {
     super.onClose();
   }
 
+  void checkBluetoothStatus() async {
+    // ignore: deprecated_member_use
+    bool isOn = await FlutterBluePlus.isOn;
+    if (!isOn) {
+      Get.defaultDialog(
+        title: 'Bluetooth Diperlukan',
+        titleStyle: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+        // title: "",
+        contentPadding:
+            const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
+        backgroundColor: AppColors.mainBackground,
+        content: Column(
+          children: [
+            const Icon(Icons.bluetooth_disabled,
+                size: 60, color: AppColors.primaryColor),
+            const SizedBox(height: 10),
+            const Text(
+              'Harap hidupkan bluetooth untuk menggunakan fitur ini.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Get.offNamed(Routes.NAVBAR, arguments: 1);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        barrierDismissible: false,
+      );
+    } else {
+      listBondedDevices();
+    }
+  }
+
   void startScan() {
+    checkBluetoothStatus();
     devicesList.clear();
-    FlutterBluePlus.startScan(timeout: Duration(seconds: 5));
+    FlutterBluePlus.startScan(timeout: const Duration(seconds: 5));
 
     FlutterBluePlus.scanResults.listen((results) {
       for (ScanResult r in results) {
-        // print('${r.device} found! rssi: ${r.rssi}');
         if (!devicesList.contains(r.device)) {
           devicesList.add(r.device);
         }
@@ -43,38 +105,62 @@ class SettingsController extends GetxController {
   }
 
   void listBondedDevices() async {
-    var bonded = await FlutterBluePlus.bondedDevices;
-    bondedDevices.assignAll(bonded);
+    try {
+      var bonded = await FlutterBluePlus.bondedDevices;
+      if (bonded.isEmpty) {
+        return;
+      }
+      bondedDevices.assignAll(bonded);
+    } catch (e) {
+      print('Error retrieving bonded devices: $e');
+    }
   }
 
   void printBondedDevices() {
+    if (bondedDevices.isEmpty) {
+      return;
+    }
     for (var device in bondedDevices) {
       print(device.platformName);
     }
   }
 
-  void connectToAmazfitGTR() async {
-    var bondedDevices = await FlutterBluePlus.bondedDevices;
-    BluetoothDevice? amazfitGTR;
-
-    for (var device in bondedDevices) {
-      if (device.platformName == "Amazfit GTR") {
-        amazfitGTR = device;
-        break;
+  Future<void> connectToDevice(BluetoothDevice device) async {
+    try {
+      isLoading(true);
+      loadingDevice.value = device;
+      await device.connect(autoConnect: false);
+      connectedDevice.value = device;
+      await discoverServices(device);
+      if (hasHeartRateService()) {
+        await subscribeToHeartRateNotifications(device);
+        print('Connected to device with heart rate service');
+      } else {
+        await device.disconnect();
+        connectedDevice.value = null;
+        print('No heart rate service in this device');
       }
+    } catch (e) {
+      print('Failed to connect to device: $e');
+      connectedDevice.value = null;
+    } finally {
+      loadingDevice.value = null;
+      isLoading(false);
     }
+  }
 
-    if (amazfitGTR != null) {
-      try {
-        await amazfitGTR.connect(autoConnect: false);
-        print('Connected to Amazfit GTR');
-        connectedDevice.value = amazfitGTR;
-        await discoverServices(amazfitGTR);
-      } catch (e) {
-        print('Failed to connect to Amazfit GTR: $e');
-      }
-    } else {
-      print('Amazfit GTR not found among bonded devices');
+  Future<void> disconnectDevice(BluetoothDevice device) async {
+    try {
+      isLoading(true);
+      loadingDevice.value = device;
+      await device.disconnect();
+      connectedDevice.value = null;
+      print('Disconnected from device');
+    } catch (e) {
+      print('Failed to disconnect from device: $e');
+    } finally {
+      loadingDevice.value = null;
+      isLoading(false);
     }
   }
 
@@ -88,36 +174,37 @@ class SettingsController extends GetxController {
     }
   }
 
-  void availableServices() async {
+  bool hasHeartRateService() {
     for (var service in deviceServices) {
       if (service.uuid.toString() == "180d") {
-        print('Heart Rate Service found');
-        print(service.uuid.toString());
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> subscribeToHeartRateNotifications(BluetoothDevice device) async {
+    for (var service in deviceServices) {
+      if (service.uuid.toString() == "180d") {
         for (var characteristic in service.characteristics) {
           if (characteristic.uuid.toString() == "2a37") {
-            print('Heart Rate Measurement Characteristic found');
-            await subscribeToHeartRateNotifications(characteristic);
+            await characteristic.setNotifyValue(true);
+            characteristic.value.listen((value) {
+              if (value.isNotEmpty) {
+                int heartRate = extractHeartRate(value);
+                this.heartRate.value = heartRate;
+                print('Heart Rate Notification: $heartRate');
+              } else {
+                print('Received empty notification');
+              }
+            });
+            print('Subscribed to heart rate notifications');
+            return;
           }
         }
       }
     }
-  }
-
-  Future<void> subscribeToHeartRateNotifications(
-      BluetoothCharacteristic characteristic) async {
-    try {
-      await characteristic.setNotifyValue(true);
-      characteristic.value.listen((value) {
-        if (value.isNotEmpty) {
-          int heartRate = extractHeartRate(value);
-          print('Heart Rate Notification: $heartRate');
-        } else {
-          print('Received empty notification');
-        }
-      });
-    } catch (e) {
-      print('Failed to subscribe to heart rate notifications: $e');
-    }
+    print('Heart Rate Measurement Characteristic not found');
   }
 
   int extractHeartRate(List<int> value) {

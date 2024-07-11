@@ -1,27 +1,28 @@
 import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'package:get/get.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
 import 'package:sindikat_app/app/modules/settings/controllers/settings_controller.dart';
 
-class DevicesView extends GetView {
+class DevicesView extends GetView<SettingsController> {
   const DevicesView({super.key});
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(SettingsController());
+    controller.checkBluetoothStatus(); // Check Bluetooth status on view load
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Perangkat Tertaut',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            )),
+        title: const Text(
+          'Perangkat Tertaut',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         iconTheme: const IconThemeData(color: AppColors.white),
         centerTitle: true,
         backgroundColor: AppColors.secondaryColor,
@@ -41,9 +42,9 @@ class DevicesView extends GetView {
             ),
           ),
           Positioned(
-            top: 120 + 50,
+            top: 170, // 120 + 50
             child: Container(
-              height: Get.height - 120 - 50,
+              height: Get.height - 170, // 120 + 50
               width: Get.width,
               decoration: const BoxDecoration(
                 color: AppColors.white,
@@ -109,7 +110,8 @@ class DevicesView extends GetView {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryColor,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         onPressed: () {
                           controller.printBondedDevices();
@@ -140,7 +142,11 @@ class DevicesView extends GetView {
                         children: [
                           const Padding(
                             padding: EdgeInsets.only(
-                                left: 16, top: 16, bottom: 16, right: 16),
+                              left: 16,
+                              top: 16,
+                              bottom: 16,
+                              right: 16,
+                            ),
                             child: Text(
                               "Perangkat Tersimpan",
                               style: TextStyle(
@@ -156,6 +162,7 @@ class DevicesView extends GetView {
                               itemCount:
                                   min(controller.bondedDevices.length, 5),
                               itemBuilder: (context, index) {
+                                final device = controller.bondedDevices[index];
                                 return Container(
                                   decoration: const BoxDecoration(
                                     border: Border(
@@ -167,7 +174,9 @@ class DevicesView extends GetView {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
+                                      horizontal: 16,
+                                      vertical: 8,
+                                    ),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -195,11 +204,8 @@ class DevicesView extends GetView {
                                                 SizedBox(
                                                   width: Get.width * 0.4,
                                                   child: Text(
-                                                    controller
-                                                        .bondedDevices[index]
-                                                        // ignore: deprecated_member_use
-                                                        .name
-                                                        .toString(),
+                                                    // ignore: deprecated_member_use
+                                                    device.name.toString(),
                                                     style: const TextStyle(
                                                       color: AppColors
                                                           .primaryBlack,
@@ -213,10 +219,8 @@ class DevicesView extends GetView {
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  controller
-                                                      .bondedDevices[index]
-                                                      .remoteId
-                                                      .toString(),
+                                                  // ignore: deprecated_member_use
+                                                  device.id.toString(),
                                                   style: const TextStyle(
                                                     color: AppColors.greyText,
                                                     fontSize: 12,
@@ -230,28 +234,84 @@ class DevicesView extends GetView {
                                         ),
                                         SizedBox(
                                           height: 25,
-                                          child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 16),
-                                                backgroundColor:
-                                                    AppColors.primaryColor,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            4)),
-                                              ),
-                                              onPressed: () {
-                                                FocusScope.of(context)
-                                                    .unfocus();
-                                              },
-                                              child: const Text("Connect",
-                                                  style: TextStyle(
-                                                      color: AppColors.white,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.normal))),
+                                          child: Obx(() {
+                                            return controller
+                                                        .loadingDevice.value ==
+                                                    device
+                                                ? const Row(
+                                                    children: [
+                                                      SizedBox(
+                                                          height: 25,
+                                                          width: 25,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            strokeWidth: 3,
+                                                            color: AppColors
+                                                                .primaryColor,
+                                                          )),
+                                                      SizedBox(width: 25),
+                                                    ],
+                                                  )
+                                                : ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 16,
+                                                      ),
+                                                      backgroundColor: controller
+                                                                  .connectedDevice
+                                                                  .value ==
+                                                              device
+                                                          ? AppColors
+                                                              .secondaryColor
+                                                          : AppColors
+                                                              .primaryColor,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4),
+                                                      ),
+                                                    ),
+                                                    onPressed: controller
+                                                                    .connectedDevice
+                                                                    .value !=
+                                                                null &&
+                                                            controller
+                                                                    .connectedDevice
+                                                                    .value !=
+                                                                device
+                                                        ? null
+                                                        : () async {
+                                                            if (controller
+                                                                    .connectedDevice
+                                                                    .value ==
+                                                                device) {
+                                                              await controller
+                                                                  .disconnectDevice(
+                                                                      device);
+                                                            } else {
+                                                              await controller
+                                                                  .connectToDevice(
+                                                                      device);
+                                                            }
+                                                          },
+                                                    child: Text(
+                                                      controller.connectedDevice
+                                                                  .value ==
+                                                              device
+                                                          ? "Disconnect"
+                                                          : "Connect",
+                                                      style: const TextStyle(
+                                                        color: AppColors.white,
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                      ),
+                                                    ),
+                                                  );
+                                          }),
                                         ),
                                       ],
                                     ),
@@ -267,7 +327,7 @@ class DevicesView extends GetView {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
       backgroundColor: AppColors.secondaryColor,
