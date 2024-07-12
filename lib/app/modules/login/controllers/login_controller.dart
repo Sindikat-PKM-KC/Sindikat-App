@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:io' show Platform, Process;
 
 class LoginController extends GetxController {
   final loginFormKey = GlobalKey<FormState>();
@@ -45,15 +46,25 @@ class LoginController extends GetxController {
   }
 
   Future<bool> _checkAndRequestPermissions() async {
-    // List of permissions to request
+    // List of common permissions
     List<Permission> permissions = [
       Permission.bluetooth,
       Permission.phone,
       Permission.contacts,
       Permission.microphone,
       Permission.location,
-      // Permission.storage,
     ];
+
+    // Add storage permissions based on Android version
+    if (Platform.isAndroid) {
+      if (await _isAtLeastAndroidR()) {
+        // Android 11 (R) and above
+        permissions.add(Permission.manageExternalStorage);
+      } else {
+        // Below Android 11
+        permissions.add(Permission.storage);
+      }
+    }
 
     // Request permissions
     Map<Permission, PermissionStatus> statuses = await permissions.request();
@@ -70,6 +81,29 @@ class LoginController extends GetxController {
     }
 
     return allGranted;
+  }
+
+// Helper method to check Android version
+  Future<bool> _isAtLeastAndroidR() async {
+    final version = await _getAndroidVersion();
+    return version >= 30; // Android R (API level 30) corresponds to version 11
+  }
+
+// Method to get the Android version
+  Future<int> _getAndroidVersion() async {
+    return Platform.isAndroid
+        ? int.parse((await _getSystemProperty('ro.build.version.sdk')) ?? '0')
+        : 0;
+  }
+
+// Method to get system property
+  Future<String?> _getSystemProperty(String key) async {
+    try {
+      final result = await Process.run('getprop', [key]);
+      return result.stdout.toString().trim();
+    } catch (e) {
+      return null;
+    }
   }
 
   void increment() => count.value++;

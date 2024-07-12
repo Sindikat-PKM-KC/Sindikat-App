@@ -114,7 +114,7 @@ class DevicesView extends GetView<SettingsController> {
                           ),
                         ),
                         onPressed: () {
-                          controller.printBondedDevices();
+                          print(controller.listHeartRate);
                           FocusScope.of(context).unfocus();
                         },
                         child: const Text(

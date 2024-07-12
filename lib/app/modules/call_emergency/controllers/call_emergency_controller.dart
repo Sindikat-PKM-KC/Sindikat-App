@@ -1,14 +1,31 @@
 import 'package:get/get.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:phone_state/phone_state.dart';
 
 class CallEmergencyController extends GetxController {
   final countdown = 3.obs;
   var countdownInterrupted = false.obs;
+  var phoneNumber = '082146560178';
 
   @override
   void onInit() {
     super.onInit();
-    _startCountdown();
+    _makeInitialCall();
+    _listenForCallEnd();
+  }
+
+  Future<void> _makeInitialCall() async {
+    await makePhoneCall(phoneNumber);
+  }
+
+  void _listenForCallEnd() {
+    PhoneState.stream.listen((event) {
+      if (event.status == PhoneStateStatus.CALL_ENDED &&
+          phoneNumber == event.number) {
+        _startCountdown();
+      }
+    });
   }
 
   void _startCountdown() {
@@ -38,5 +55,13 @@ class CallEmergencyController extends GetxController {
 
   void _navigateToNavbar() {
     Get.offAllNamed(Routes.NAVBAR);
+  }
+
+  Future<void> makePhoneCall(String phoneNumber) async {
+    try {
+      await FlutterPhoneDirectCaller.callNumber(phoneNumber);
+    } catch (e) {
+      print(e);
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
 import 'package:sindikat_app/app/modules/register/views/emergency_contact_view.dart';
 import 'package:sindikat_app/app/modules/settings/views/devices_view.dart';
@@ -12,6 +13,7 @@ class SettingsController extends GetxController {
   var connectedDevice = Rxn<BluetoothDevice>();
   var deviceServices = <BluetoothService>[].obs;
   var heartRate = 0.obs;
+  var listHeartRate = <Map<String, dynamic>>[].obs;
 
   RxBool isLoading = false.obs;
   var loadingDevice = Rxn<BluetoothDevice>();
@@ -20,16 +22,6 @@ class SettingsController extends GetxController {
   void onInit() {
     super.onInit();
     listBondedDevices();
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 
   void checkBluetoothStatus() async {
@@ -189,13 +181,18 @@ class SettingsController extends GetxController {
         for (var characteristic in service.characteristics) {
           if (characteristic.uuid.toString() == "2a37") {
             await characteristic.setNotifyValue(true);
+            // ignore: deprecated_member_use
             characteristic.value.listen((value) {
+              String currentDateTime =
+                  DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
               if (value.isNotEmpty) {
                 int heartRate = extractHeartRate(value);
                 this.heartRate.value = heartRate;
-                print('Heart Rate Notification: $heartRate');
+                listHeartRate.add(
+                    {'timestamp': currentDateTime, 'heartrate': heartRate});
               } else {
-                print('Received empty notification');
+                listHeartRate
+                    .add({'timestamp': currentDateTime, 'heartrate': 0});
               }
             });
             print('Subscribed to heart rate notifications');

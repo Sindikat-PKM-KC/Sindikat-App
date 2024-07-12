@@ -1,7 +1,9 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
+import 'package:sindikat_app/app/modules/settings/controllers/settings_controller.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -10,6 +12,8 @@ class HomeController extends GetxController {
   final RxBool isListening = false.obs;
   final String triggerPhrase = "cindy";
   final count = 0.obs;
+
+  final SettingsController settingsController = Get.put(SettingsController());
 
   @override
   void onInit() {
@@ -33,30 +37,12 @@ class HomeController extends GetxController {
         isListening.value = true;
         _startListening();
       } else {
-        Flushbar(
-          title: 'Permission Denied',
-          titleColor: AppColors.white,
-          message: 'Please allow permission to use this feature.',
-          messageColor: AppColors.white,
-          duration: const Duration(seconds: 2),
-          backgroundColor: AppColors.primaryColor,
-          margin: const EdgeInsets.all(8),
-          borderRadius: BorderRadius.circular(8),
-          flushbarPosition: FlushbarPosition.TOP,
-        ).show(Get.context!);
+        _showFlushbar('Permission Denied',
+            'Please allow permission to use this feature.');
       }
     } catch (e) {
-      Flushbar(
-        title: 'Permission Denied',
-        titleColor: AppColors.white,
-        message: 'Please allow permission to use this feature.',
-        messageColor: AppColors.white,
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppColors.primaryColor,
-        margin: const EdgeInsets.all(8),
-        borderRadius: BorderRadius.circular(8),
-        flushbarPosition: FlushbarPosition.TOP,
-      ).show(Get.context!);
+      _showFlushbar(
+          'Permission Denied', 'Please allow permission to use this feature.');
     }
   }
 
@@ -77,8 +63,6 @@ class HomeController extends GetxController {
       _speech.listen(
         onResult: (val) => _onSpeechResult(val.recognizedWords),
         localeId: "en_US",
-
-        // onSoundLevelChange: null,
       );
     }
   }
@@ -87,12 +71,61 @@ class HomeController extends GetxController {
     _speech.cancel();
   }
 
-  void _onSpeechResult(String recognizedWords) {
+  Future<void> _onSpeechResult(String recognizedWords) async {
     if (recognizedWords.toLowerCase().contains(triggerPhrase)) {
       _speech.cancel();
-      Get.offAllNamed(Routes.RECORD);
+      try {
+        Position position = await determinePosition();
+        Map<String, dynamic> arguments = {
+          'listHeartRate': settingsController.listHeartRate,
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        };
+        Get.offAllNamed(Routes.RECORD, arguments: arguments);
+      } catch (e) {
+        _showFlushbar('Error', e.toString());
+      }
     }
   }
 
   void increment() => count.value++;
+
+  Future<Position> determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
+  void _showFlushbar(String title, String message) {
+    Flushbar(
+      title: title,
+      titleColor: AppColors.white,
+      message: message,
+      messageColor: AppColors.white,
+      duration: const Duration(seconds: 2),
+      backgroundColor: AppColors.primaryColor,
+      margin: const EdgeInsets.all(8),
+      borderRadius: BorderRadius.circular(8),
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(Get.context!);
+  }
 }
