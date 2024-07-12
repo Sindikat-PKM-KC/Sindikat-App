@@ -13,6 +13,7 @@ abstract class Routes {
   static const RECORD = _Paths.RECORD;
   static const CALL_EMERGENCY = _Paths.CALL_EMERGENCY;
   static const ALARM = _Paths.ALARM;
+  static const OFFLINE = _Paths.OFFLINE;
 }
 
 abstract class _Paths {
@@ -27,4 +28,5 @@ abstract class _Paths {
   static const RECORD = '/record';
   static const CALL_EMERGENCY = '/call-emergency';
   static const ALARM = '/alarm';
+  static const OFFLINE = '/offline';
 }

@@ -10,6 +10,8 @@ import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/navbar/bindings/navbar_binding.dart';
 import '../modules/navbar/views/navbar_view.dart';
+import '../modules/offline/bindings/offline_binding.dart';
+import '../modules/offline/views/offline_view.dart';
 import '../modules/playground/bindings/playground_binding.dart';
 import '../modules/playground/views/playground_view.dart';
 import '../modules/record/bindings/record_binding.dart';
@@ -78,6 +80,11 @@ class AppPages {
       name: _Paths.ALARM,
       page: () => const AlarmView(),
       binding: AlarmBinding(),
+    ),
+    GetPage(
+      name: _Paths.OFFLINE,
+      page: () => const OfflineView(),
+      binding: OfflineBinding(),
     ),
   ];
 }

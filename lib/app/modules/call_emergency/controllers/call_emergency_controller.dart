@@ -50,10 +50,12 @@ class CallEmergencyController extends GetxController {
   }
 
   void _navigateToAlarm() {
+    Get.deleteAll(force: true);
     Get.offAllNamed(Routes.ALARM);
   }
 
   void _navigateToNavbar() {
+    Get.deleteAll(force: true);
     Get.offAllNamed(Routes.NAVBAR);
   }
 

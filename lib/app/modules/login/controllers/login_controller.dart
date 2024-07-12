@@ -1,12 +1,23 @@
+import 'dart:convert';
+
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:sindikat_app/app/constans/colors.dart';
+import 'package:sindikat_app/app/constans/url.dart';
+import 'package:sindikat_app/app/data/models/user_model.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io' show Platform, Process;
+import 'package:http/http.dart' as http;
 
 class LoginController extends GetxController {
+  final User user = User();
   final loginFormKey = GlobalKey<FormState>();
+  final getStorage = GetStorage();
   late TextEditingController emailController, passwordController;
+  RxBool isLoading = false.obs;
 
   final count = 0.obs;
 
@@ -34,7 +45,41 @@ class LoginController extends GetxController {
   Future<void> login(String email, String password) async {
     if (loginFormKey.currentState!.validate()) {
       if (await _checkAndRequestPermissions()) {
-        Get.offAllNamed(Routes.NAVBAR);
+        isLoading(true);
+        var url = Uri.parse("${UrlApi.baseAPI}/auth/login/");
+        var inputLogin = json.encode({
+          'email': email,
+          'password': password,
+        });
+        http
+            .post(
+          url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: inputLogin,
+        )
+            .then((res) {
+          if (res.statusCode < 300) {
+            var response = json.decode(res.body);
+            getStorage.write("access_token", response['access']);
+            getStorage.write("refresh_token", response['refresh']);
+            var user = User.fromJson(response['user']);
+            getStorage.write('user', user.toJson());
+            emailController.clear();
+            passwordController.clear();
+
+            Get.offAllNamed(Routes.NAVBAR);
+            _showFlushbar("Success", "Berhasil login", "success");
+            isLoading(false);
+          } else {
+            _showFlushbar("Error", res.reasonPhrase.toString(), "err");
+            isLoading(false);
+          }
+        }).catchError((err) {
+          _showFlushbar("Error", err.toString(), "err");
+          isLoading(false);
+        });
       } else {
         Get.snackbar(
           'Permission Denied',
@@ -43,6 +88,7 @@ class LoginController extends GetxController {
         );
       }
     }
+    loginFormKey.currentState!.save();
   }
 
   Future<bool> _checkAndRequestPermissions() async {
@@ -106,5 +152,22 @@ class LoginController extends GetxController {
     }
   }
 
-  void increment() => count.value++;
+  void _showFlushbar(String title, String message, String type) {
+    Color bgColor = type == 'success'
+        ? AppColors.secondaryColor
+        : type == 'err'
+            ? AppColors.red
+            : AppColors.white;
+    Flushbar(
+      title: title,
+      titleColor: AppColors.white,
+      message: message,
+      messageColor: AppColors.white,
+      duration: const Duration(seconds: 2),
+      backgroundColor: bgColor,
+      margin: const EdgeInsets.all(8),
+      borderRadius: BorderRadius.circular(8),
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(Get.context!);
+  }
 }

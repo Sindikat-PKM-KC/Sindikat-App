@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
-import 'package:sindikat_app/app/routes/app_pages.dart';
 
 import '../controllers/settings_controller.dart';
 
@@ -98,27 +97,31 @@ class SettingsView extends GetView<SettingsController> {
           ],
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-              ),
-              onPressed: () {
-                Get.offAllNamed(Routes.LOGIN);
-                FocusScope.of(context).unfocus();
-              },
-              child: const Text("Keluar",
-                  style: TextStyle(
-                      color: AppColors.mainBackground,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold))),
-        ),
-      ),
+      floatingActionButton: Obx(() => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: controller.isLoading.value
+                ? CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  )
+                : SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                        ),
+                        onPressed: () {
+                          controller.logout();
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: const Text("Keluar",
+                            style: TextStyle(
+                                color: AppColors.mainBackground,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold))),
+                  ),
+          )),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }

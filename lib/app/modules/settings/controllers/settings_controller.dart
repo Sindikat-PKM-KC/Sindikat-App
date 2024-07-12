@@ -1,13 +1,21 @@
+import 'dart:convert';
+
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
+import 'package:sindikat_app/app/constans/url.dart';
+import 'package:sindikat_app/app/modules/home/controllers/home_controller.dart';
 import 'package:sindikat_app/app/modules/register/views/emergency_contact_view.dart';
 import 'package:sindikat_app/app/modules/settings/views/devices_view.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
 
 class SettingsController extends GetxController {
+  final getStorage = GetStorage();
+
   var devicesList = <BluetoothDevice>[].obs;
   var bondedDevices = <BluetoothDevice>[].obs;
   var connectedDevice = Rxn<BluetoothDevice>();
@@ -104,16 +112,17 @@ class SettingsController extends GetxController {
       }
       bondedDevices.assignAll(bonded);
     } catch (e) {
-      print('Error retrieving bonded devices: $e');
-    }
-  }
-
-  void printBondedDevices() {
-    if (bondedDevices.isEmpty) {
-      return;
-    }
-    for (var device in bondedDevices) {
-      print(device.platformName);
+      Flushbar(
+        title: 'Error',
+        titleColor: AppColors.white,
+        message: e.toString(),
+        messageColor: AppColors.white,
+        duration: const Duration(seconds: 2),
+        backgroundColor: AppColors.primaryColor,
+        margin: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(8),
+        flushbarPosition: FlushbarPosition.TOP,
+      ).show(Get.context!);
     }
   }
 
@@ -126,14 +135,44 @@ class SettingsController extends GetxController {
       await discoverServices(device);
       if (hasHeartRateService()) {
         await subscribeToHeartRateNotifications(device);
-        print('Connected to device with heart rate service');
+        Flushbar(
+          title: 'Success',
+          titleColor: AppColors.white,
+          message: 'Connected to device with heart rate service',
+          messageColor: AppColors.white,
+          duration: const Duration(seconds: 2),
+          backgroundColor: AppColors.green,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP,
+        ).show(Get.context!);
       } else {
         await device.disconnect();
         connectedDevice.value = null;
-        print('No heart rate service in this device');
+        Flushbar(
+          title: 'Error',
+          titleColor: AppColors.white,
+          message: 'No heart rate service in this device',
+          messageColor: AppColors.white,
+          duration: const Duration(seconds: 2),
+          backgroundColor: AppColors.primaryColor,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP,
+        ).show(Get.context!);
       }
     } catch (e) {
-      print('Failed to connect to device: $e');
+      Flushbar(
+        title: 'Error',
+        titleColor: AppColors.white,
+        message: e.toString(),
+        messageColor: AppColors.white,
+        duration: const Duration(seconds: 2),
+        backgroundColor: AppColors.primaryColor,
+        margin: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(8),
+        flushbarPosition: FlushbarPosition.TOP,
+      ).show(Get.context!);
       connectedDevice.value = null;
     } finally {
       loadingDevice.value = null;
@@ -147,9 +186,29 @@ class SettingsController extends GetxController {
       loadingDevice.value = device;
       await device.disconnect();
       connectedDevice.value = null;
-      print('Disconnected from device');
+      Flushbar(
+        title: 'Success',
+        titleColor: AppColors.white,
+        message: 'Disconnected from device',
+        messageColor: AppColors.white,
+        duration: const Duration(seconds: 2),
+        backgroundColor: AppColors.green,
+        margin: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(8),
+        flushbarPosition: FlushbarPosition.TOP,
+      ).show(Get.context!);
     } catch (e) {
-      print('Failed to disconnect from device: $e');
+      Flushbar(
+        title: 'Error',
+        titleColor: AppColors.white,
+        message: e.toString(),
+        messageColor: AppColors.white,
+        duration: const Duration(seconds: 2),
+        backgroundColor: AppColors.primaryColor,
+        margin: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(8),
+        flushbarPosition: FlushbarPosition.TOP,
+      ).show(Get.context!);
     } finally {
       loadingDevice.value = null;
       isLoading(false);
@@ -160,9 +219,18 @@ class SettingsController extends GetxController {
     try {
       List<BluetoothService> services = await device.discoverServices();
       deviceServices.assignAll(services);
-      print('Discovered services: ${services.length}');
     } catch (e) {
-      print('Failed to discover services: $e');
+      Flushbar(
+        title: 'Error',
+        titleColor: AppColors.white,
+        message: e.toString(),
+        messageColor: AppColors.white,
+        duration: const Duration(seconds: 2),
+        backgroundColor: AppColors.primaryColor,
+        margin: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(8),
+        flushbarPosition: FlushbarPosition.TOP,
+      ).show(Get.context!);
     }
   }
 
@@ -195,13 +263,11 @@ class SettingsController extends GetxController {
                     .add({'timestamp': currentDateTime, 'heartrate': 0});
               }
             });
-            print('Subscribed to heart rate notifications');
             return;
           }
         }
       }
     }
-    print('Heart Rate Measurement Characteristic not found');
   }
 
   int extractHeartRate(List<int> value) {
@@ -224,5 +290,49 @@ class SettingsController extends GetxController {
   void connectedDevices() {
     listBondedDevices();
     Get.to(() => const DevicesView());
+  }
+
+  logout() async {
+    isLoading(true);
+    var url = Uri.parse("${UrlApi.baseAPI}/logout/");
+    HomeController homeController = Get.find<HomeController>();
+    homeController.stopSpeech();
+    getStorage.erase();
+    Future.delayed(const Duration(seconds: 1), () {
+      isLoading(false);
+      homeController.stopSpeech();
+      Get.deleteAll(force: true);
+      Get.offAllNamed(Routes.LOGIN);
+    });
+
+    // var token = 'Bearer ${loginController.getStorage.read("access_token")}';
+    // var refresh = loginController.getStorage.read('refresh_token');
+    // var inputLogout = json.encode({
+    //   'refresh_token': refresh,
+    // });
+    // final response = await http.post(
+    //   url,
+    //   headers: <String, String>{
+    //     'Content-Type': 'application/json; charset=UTF-8',
+    //     'Authorization': token,
+    //   },
+    //   body: inputLogout,
+    // );
+    // if (response.statusCode < 300) {
+    //   isLoading(false);
+    //   SnackBarWidget.showSnackBar(
+    //     'Logout Berhasil',
+    //     'Anda telah berhasil keluar ke akun Anda',
+    //     'Success',
+    //   );
+    //   Get.offAllNamed(Routes.LOGIN);
+    // } else {
+    //   isLoading(false);
+    //   SnackBarWidget.showSnackBar(
+    //     'Logout Gagal',
+    //     'Terjadi kesalahan saat keluar dari akun Anda',
+    //     'err',
+    //   );
+    // }
   }
 }

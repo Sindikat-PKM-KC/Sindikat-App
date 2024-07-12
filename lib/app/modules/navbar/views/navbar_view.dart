@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
 import 'package:sindikat_app/app/modules/home/views/home_view.dart';
-import 'package:sindikat_app/app/modules/playground/views/playground_view.dart';
+// import 'package:sindikat_app/app/modules/playground/views/playground_view.dart';
 import 'package:sindikat_app/app/modules/settings/views/settings_view.dart';
 import 'package:transitioned_indexed_stack/transitioned_indexed_stack.dart';
 
@@ -24,7 +24,7 @@ class NavbarView extends GetView<NavbarController> {
           children: const [
             HomeView(),
             SettingsView(),
-            PlaygroundView(),
+            // PlaygroundView(),
           ],
         ),
         bottomNavigationBar: Theme(
@@ -63,14 +63,14 @@ class NavbarView extends GetView<NavbarController> {
                 ),
                 label: 'Settings',
               ),
-              BottomNavigationBarItem(
-                activeIcon: Icon(Icons.bug_report),
-                icon: Icon(
-                  Icons.bug_report_outlined,
-                  color: AppColors.white,
-                ),
-                label: 'Playground',
-              ),
+              // BottomNavigationBarItem(
+              //   activeIcon: Icon(Icons.bug_report),
+              //   icon: Icon(
+              //     Icons.bug_report_outlined,
+              //     color: AppColors.white,
+              //   ),
+              //   label: 'Playground',
+              // ),
             ],
           ),
         ),

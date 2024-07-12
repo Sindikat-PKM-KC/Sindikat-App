@@ -71,6 +71,12 @@ class HomeController extends GetxController {
     _speech.cancel();
   }
 
+  stopSpeech() {
+    _speech.cancel();
+    // _speech.stop();
+    // isListening.value = false;
+  }
+
   Future<void> _onSpeechResult(String recognizedWords) async {
     if (recognizedWords.toLowerCase().contains(triggerPhrase)) {
       _speech.cancel();
