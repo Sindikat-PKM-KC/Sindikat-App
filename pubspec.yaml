@@ -12,7 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.32.8
+  flutter_launcher_icons: ^0.13.1
   flutter_native_contact_picker: ^0.0.6
+  flutter_native_splash: ^2.4.0
   flutter_phone_direct_caller: ^2.1.1
   flutter_sound: ^9.6.0
   flutter_svg: ^2.0.10+1
@@ -36,6 +38,22 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   flutter_test:
     sdk: flutter
+
+flutter_native_splash:
+  color: "#FEF3E1"
+  image: assets/images/splash.png
+  android: true
+  android_12:
+    color: "#FEF3E1"
+    image: assets/images/splash.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/splash.png"
+  adaptive_icon_background: "#FEF3E1"
+  adaptive_icon_foreground: "assets/images/splash.png"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true

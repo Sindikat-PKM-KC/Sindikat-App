@@ -294,7 +294,7 @@ class SettingsController extends GetxController {
 
   logout() async {
     isLoading(true);
-    var url = Uri.parse("${UrlApi.baseAPI}/logout/");
+    // var url = Uri.parse("${UrlApi.baseAPI}/logout/");
     HomeController homeController = Get.find<HomeController>();
     homeController.stopSpeech();
     getStorage.erase();

@@ -8,7 +8,6 @@ class OfflineView extends GetView<OfflineController> {
   const OfflineView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(OfflineController());
     return Scaffold(
       appBar: AppBar(
         title: const Text('OfflineView'),

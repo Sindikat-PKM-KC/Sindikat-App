@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:sindikat_app/app/routes/app_pages.dart';
 
 class OfflineController extends GetxController {
   //TODO: Implement OfflineController
