@@ -32,6 +32,14 @@ class SettingsController extends GetxController {
     listBondedDevices();
   }
 
+  @override
+  void onClose() {
+    if (connectedDevice.value != null) {
+      disconnectDevice(connectedDevice.value!);
+    }
+    super.onClose();
+  }
+
   void checkBluetoothStatus() async {
     // ignore: deprecated_member_use
     bool isOn = await FlutterBluePlus.isOn;
@@ -259,6 +267,7 @@ class SettingsController extends GetxController {
                 listHeartRate.add(
                     {'timestamp': currentDateTime, 'heartrate': heartRate});
               } else {
+                heartRate.value = 0;
                 listHeartRate
                     .add({'timestamp': currentDateTime, 'heartrate': 0});
               }

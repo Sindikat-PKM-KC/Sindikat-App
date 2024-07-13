@@ -9,7 +9,7 @@ class SettingsView extends GetView<SettingsController> {
   const SettingsView({super.key});
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SettingsController());
+    final controller = Get.put(SettingsController(), permanent: true);
     return Scaffold(
       backgroundColor: AppColors.secondaryColor,
       appBar: AppBar(
@@ -100,7 +100,7 @@ class SettingsView extends GetView<SettingsController> {
       floatingActionButton: Obx(() => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: controller.isLoading.value
-                ? CircularProgressIndicator(
+                ? const CircularProgressIndicator(
                     color: AppColors.primaryColor,
                   )
                 : SizedBox(

@@ -187,24 +187,27 @@ class LoginView extends GetView<LoginController> {
                           : SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryColor,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  onPressed: () {
-                                    // Get.offAllNamed(Routes.NAVBAR);
-                                    controller.login(
-                                      controller.emailController.text,
-                                      controller.passwordController.text,
-                                    );
-                                    FocusScope.of(context).unfocus();
-                                  },
-                                  child: const Text("Masuk",
-                                      style: TextStyle(
-                                          color: AppColors.white,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold))),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                ),
+                                onPressed: () {
+                                  // Get.offAllNamed(Routes.NAVBAR);
+                                  controller.login(
+                                    controller.emailController.text,
+                                    controller.passwordController.text,
+                                  );
+                                  FocusScope.of(context).unfocus();
+                                },
+                                child: const Text(
+                                  "Masuk",
+                                  style: TextStyle(
+                                      color: AppColors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ),
                       const SizedBox(height: 16),
                       Center(

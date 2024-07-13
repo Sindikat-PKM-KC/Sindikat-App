@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:another_flushbar/flushbar.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -19,13 +21,22 @@ class LoginController extends GetxController {
   late TextEditingController emailController, passwordController;
   RxBool isLoading = false.obs;
 
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+
   final count = 0.obs;
 
   @override
   void onInit() {
+    listenToConnectivityChanges();
     emailController = TextEditingController();
     passwordController = TextEditingController();
     super.onInit();
+  }
+
+  @override
+  void onClose() {
+    _connectivitySubscription.cancel();
+    super.onClose();
   }
 
   String? validateEmail(String value) {
@@ -169,5 +180,39 @@ class LoginController extends GetxController {
       borderRadius: BorderRadius.circular(8),
       flushbarPosition: FlushbarPosition.TOP,
     ).show(Get.context!);
+  }
+
+  void listenToConnectivityChanges() {
+    _connectivitySubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> results) {
+      if (results.any((result) => result == ConnectivityResult.none)) {
+        Get.offAllNamed(Routes.OFFLINE);
+        // Get.dialog(
+        //   AlertDialog(
+        //     title: const Text('Tidak Terhubung ke Internet',
+        //         style: TextStyle(fontWeight: FontWeight.bold)),
+        //     content: const Text(
+        //         'Kamu sudah terhubung ke internet. Apakah kamu ingin kembali ke halaman login?'),
+        //     actions: [
+        //       TextButton(
+        //         onPressed: () {
+        //           Get.offAllNamed(Routes.LOGIN);
+        //         },
+        //         child: const Text('Iya',
+        //             style: TextStyle(color: AppColors.primaryColor)),
+        //       ),
+        //       TextButton(
+        //         onPressed: () {
+        //           Get.back();
+        //         },
+        //         child: const Text('Tidak',
+        //             style: TextStyle(color: AppColors.primaryColor)),
+        //       ),
+        //     ],
+        //   ),
+        // );
+      }
+    });
   }
 }
