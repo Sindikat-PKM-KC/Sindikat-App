@@ -8,7 +8,7 @@ import 'package:sindikat_app/app/constans/colors.dart';
 import '../controllers/offline_controller.dart';
 
 class OfflineView extends GetView<OfflineController> {
-  const OfflineView({Key? key}) : super(key: key);
+  const OfflineView({super.key});
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(OfflineController());
@@ -48,7 +48,7 @@ class OfflineView extends GetView<OfflineController> {
                 const SizedBox(height: 54),
                 const SizedBox(height: 72),
                 GestureDetector(
-                  onLongPress: () => controller.toggleAlarm(),
+                  onLongPress: () => controller.stopAlarm(),
                   child: Stack(
                     children: [
                       Positioned(

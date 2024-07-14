@@ -31,6 +31,7 @@ dependencies:
   phone_state: ^1.0.4
   speech_to_text: ^6.6.0
   string_extensions: ^0.7.2
+  tflite_audio: ^0.3.0
   transitioned_indexed_stack: ^1.0.2
   url_launcher: ^6.3.0
   volume_controller: ^2.0.7
@@ -65,3 +66,5 @@ flutter:
     - assets/models/
     - assets/lottie/
     - assets/audios/
+    - assets/labels.txt
+    - assets/soundclassifier_with_metadata.tflite

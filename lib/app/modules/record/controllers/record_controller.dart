@@ -110,6 +110,7 @@ class RecordController extends GetxController {
   }
 
   Future<void> sendFileToApi(File file) async {
+    print('sendFileToApi');
     try {
       _showLoadingAnimation();
       var url = Uri.parse('${UrlApi.baseAPI}/audios/upload/');
@@ -121,6 +122,7 @@ class RecordController extends GetxController {
       if (response.statusCode < 300) {
         Get.offAllNamed(Routes.CALL_EMERGENCY);
       } else {
+        print(response.reasonPhrase);
         Flushbar(
           title: 'Error',
           titleColor: AppColors.white,
@@ -132,9 +134,10 @@ class RecordController extends GetxController {
           borderRadius: BorderRadius.circular(8),
           flushbarPosition: FlushbarPosition.TOP,
         ).show(Get.context!);
-        Get.offAllNamed(Routes.NAVBAR);
+        // Get.offAllNamed(Routes.NAVBAR);
       }
     } catch (e) {
+      print(e);
       Flushbar(
         title: 'Error',
         titleColor: AppColors.white,
@@ -146,7 +149,7 @@ class RecordController extends GetxController {
         borderRadius: BorderRadius.circular(8),
         flushbarPosition: FlushbarPosition.TOP,
       ).show(Get.context!);
-      Get.offAllNamed(Routes.NAVBAR);
+      // Get.offAllNamed(Routes.NAVBAR);
     }
   }
 

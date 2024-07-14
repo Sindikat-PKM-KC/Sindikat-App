@@ -1,4 +1,4 @@
-import 'dart:convert';
+// import 'dart:convert';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +7,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
-import 'package:sindikat_app/app/constans/url.dart';
-import 'package:sindikat_app/app/modules/home/controllers/home_controller.dart';
+// import 'package:sindikat_app/app/constans/url.dart';
+// import 'package:sindikat_app/app/modules/home/controllers/home_controller.dart';
 import 'package:sindikat_app/app/modules/register/views/emergency_contact_view.dart';
 import 'package:sindikat_app/app/modules/settings/views/devices_view.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
@@ -304,15 +304,15 @@ class SettingsController extends GetxController {
   logout() async {
     isLoading(true);
     // var url = Uri.parse("${UrlApi.baseAPI}/logout/");
-    HomeController homeController = Get.find<HomeController>();
-    homeController.stopSpeech();
+    // HomeController homeController = Get.find<HomeController>();
+    // homeController.stopSpeech();
     getStorage.erase();
-    Future.delayed(const Duration(seconds: 1), () {
-      isLoading(false);
-      homeController.stopSpeech();
-      Get.deleteAll(force: true);
-      Get.offAllNamed(Routes.LOGIN);
-    });
+    // Future.delayed(const Duration(seconds: 1), () {
+    isLoading(false);
+    // homeController.stopSpeech();
+    Get.deleteAll(force: true);
+    Get.offAllNamed(Routes.LOGIN);
+    // });
 
     // var token = 'Bearer ${loginController.getStorage.read("access_token")}';
     // var refresh = loginController.getStorage.read('refresh_token');

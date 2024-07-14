@@ -14,7 +14,6 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
     SettingsController settingsController = Get.find<SettingsController>();
-    controller.reInitSpeech();
     return AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
           statusBarColor: AppColors.secondaryColor, // Set the desired color
