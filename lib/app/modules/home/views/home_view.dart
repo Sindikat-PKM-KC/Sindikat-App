@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
-import 'package:sindikat_app/app/modules/settings/controllers/settings_controller.dart';
 
 import '../controllers/home_controller.dart';
 
@@ -13,7 +12,7 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
-    SettingsController settingsController = Get.find<SettingsController>();
+    controller.relisten();
     return AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
           statusBarColor: AppColors.secondaryColor, // Set the desired color
@@ -29,10 +28,10 @@ class HomeView extends GetView<HomeController> {
                 () => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Center(
+                    Center(
                       child: Text(
-                        "SINDIKAT User",
-                        style: TextStyle(
+                        controller.user['name'] ?? "",
+                        style: const TextStyle(
                           color: AppColors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -110,7 +109,7 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ),
                     // const SizedBox(height: 32),
-                    settingsController.heartRate.value == 0
+                    controller.settingsController.heartRate.value == 0
                         ? const SizedBox()
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -128,7 +127,7 @@ class HomeView extends GetView<HomeController> {
                               Text.rich(
                                 TextSpan(
                                   text:
-                                      '${settingsController.heartRate.value} ',
+                                      '${controller.settingsController.heartRate.value} ',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,

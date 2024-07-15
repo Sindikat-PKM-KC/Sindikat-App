@@ -1,24 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 
-// import 'package:another_flushbar/flushbar.dart';
-// import 'package:audioplayers/audioplayers.dart';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-// import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-// import 'package:sindikat_app/app/constans/colors.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:sindikat_app/app/constans/colors.dart';
+
 import 'package:sindikat_app/app/modules/settings/controllers/settings_controller.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
-// import 'package:speech_to_text/speech_to_text.dart' as stt;
+
 import 'package:tflite_audio/tflite_audio.dart';
 
 class HomeController extends GetxController {
-  // final stt.SpeechToText _speech = stt.SpeechToText();
-  // final RxBool isListening = false.obs;
-  // final String triggerPhrase = "cindy";
-  // final count = 0.obs;
-
+  final getStorage = GetStorage();
+  var user = {}.obs;
   var isPlaying = false.obs;
   double originalVolume = 0.5;
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
@@ -30,12 +28,11 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // _initSpeech();
-    // position = determinePosition() as Position?;
+    user.value = getStorage.read('user');
     TfliteAudio.loadModel(
       model: 'assets/soundclassifier_with_metadata.tflite',
       label: 'assets/labels.txt',
-      inputType: 'rawAudio', // Add the required inputType parameter
+      inputType: 'rawAudio',
       numThreads: 1,
       isAsset: true,
       outputRawScores: true,
@@ -46,10 +43,9 @@ class HomeController extends GetxController {
 
   @override
   void onClose() {
-    // _speech.cancel();
-    _connectivitySubscription.cancel();
     _resultSubscription.cancel();
     TfliteAudio.stopAudioRecognition();
+    _connectivitySubscription.cancel();
     super.onClose();
   }
 
@@ -60,12 +56,12 @@ class HomeController extends GetxController {
         sampleRate: 44100,
         bufferSize: 22016,
         audioLength: 44032,
-        detectionThreshold: 0.95,
+        detectionThreshold: 0.85,
         numOfInferences: 5,
         method: 'setAudioRecognitionStream',
       );
 
-      _resultSubscription = resultStream.listen((event) {
+      _resultSubscription = resultStream.listen((event) async {
         String recognitionString = event["recognitionResult"].toString();
         List<dynamic> recognitionResult;
 
@@ -81,11 +77,20 @@ class HomeController extends GetxController {
             .cast<double>();
 
         if (filteredResults.isNotEmpty) {
-          if (filteredResults[1] >= 0.95) {
+          if (filteredResults[1] >= 0.85) {
+            Position position;
+            try {
+              position = await determinePosition();
+            } catch (e) {
+              return;
+            }
+
+            var googleMapLink =
+                "https://www.google.com/maps/search/?api=1&query=${position.latitude},${position.longitude}";
+
             Map<String, dynamic> arguments = {
               'listHeartRate': settingsController.listHeartRate,
-              // 'latitude': position?.latitude,
-              // 'longitude': position?.longitude,
+              'location': googleMapLink,
             };
             Get.delete<HomeController>();
             Get.offAllNamed(Routes.RECORD, arguments: arguments);
@@ -102,85 +107,60 @@ class HomeController extends GetxController {
     }
   }
 
+  void relisten() {
+    isModelRunning.value = false;
+    _startListening();
+  }
+
   void listenToConnectivityChanges() {
     _connectivitySubscription = Connectivity()
         .onConnectivityChanged
         .listen((List<ConnectivityResult> results) {
-      if (results.isNotEmpty &&
-          results.any((result) => result != ConnectivityResult.none)) {
-        Get.offAllNamed(Routes.NAVBAR);
+      if (results.any((result) => result == ConnectivityResult.none)) {
+        _stopListening();
+      } else {
+        if (!isModelRunning.value) {
+          _startListening();
+        }
       }
     });
   }
 
-  // void _initSpeech() async {
-  //   try {
-  //     bool available = await _speech.initialize(
-  //       onStatus: _onSpeechStatus,
-  //       onError: _onSpeechError,
-  //     );
-  //     if (available) {
-  //       isListening.value = true;
-  //       _startListening();
-  //     } else {
-  //       _showFlushbar('Permission Denied',
-  //           'Please allow permission to use this feature.');
-  //     }
-  //   } catch (e) {
-  //     _showFlushbar(
-  //         'Permission Denied', 'Please allow permission to use this feature.');
-  //   }
-  // }
+  void _showFlushbar(String title, String message, String type) {
+    Color bgColor = type == 'success'
+        ? AppColors.secondaryColor
+        : type == 'err'
+            ? AppColors.red
+            : AppColors.white;
+    Flushbar(
+      title: title,
+      titleColor: AppColors.white,
+      message: message,
+      messageColor: AppColors.white,
+      duration: const Duration(seconds: 2),
+      backgroundColor: bgColor,
+      margin: const EdgeInsets.all(8),
+      borderRadius: BorderRadius.circular(8),
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(Get.context!);
+  }
 
-  // void _onSpeechStatus(String status) {
-  //   if (status == 'notListening' && isListening.value) {
-  //     _startListening();
-  //   }
-  // }
-
-  // void _onSpeechError(dynamic error) {
-  //   if (isListening.value) {
-  //     _startListening();
-  //   }
-  // }
-
-  // void _startListening() {
-  //   if (isListening.value && !_speech.isListening) {
-  //     _speech.listen(
-  //       onResult: (val) => _onSpeechResult(val.recognizedWords),
-  //       localeId: "en_US",
-  //     );
-  //   }
-  // }
-
-  // void reInitSpeech() {
-  //   _speech.cancel();
-  // }
-
-  // stopSpeech() {
-  //   _speech.cancel();
-  //   // _speech.stop();
-  //   // isListening.value = false;
-  // }
-
-  // Future<void> _onSpeechResult(String recognizedWords) async {
-  //   if (recognizedWords.toLowerCase().contains(triggerPhrase)) {
-  //     _speech.cancel();
-  //     try {
-  //       Position position = await determinePosition();
-  //       Map<String, dynamic> arguments = {
-  //         'listHeartRate': settingsController.listHeartRate,
-  //         'latitude': position.latitude,
-  //         'longitude': position.longitude,
-  //       };
-  //       Get.offAllNamed(Routes.RECORD, arguments: arguments);
-  //     } catch (e) {
-  //       _showFlushbar('Error', e.toString());
-  //     }
-  //   }
-  // }
-
-  // void increment() => count.value++;
+  void _stopListening() {
+    _showFlushbar('Offline', 'You are offline', 'err');
+    if (isModelRunning.value) {
+      print('stop listening 2');
+      _resultSubscription.cancel();
+      TfliteAudio.stopAudioRecognition();
+      isModelRunning.value = false;
+      _showFlushbar('Offline', 'You are offline', 'err');
+      // // Get.delete(force: true);
+      // Future.delayed(const Duration(seconds: 2), () {
+      Get.delete<HomeController>();
+      Get.delete<SettingsController>();
+      Get.offAllNamed(Routes.OFFLINE, arguments: "home");
+      // });
+    }
+  }
 
   Future<Position> determinePosition() async {
     bool serviceEnabled;
@@ -206,18 +186,4 @@ class HomeController extends GetxController {
 
     return await Geolocator.getCurrentPosition();
   }
-
-  // void _showFlushbar(String title, String message) {
-  //   Flushbar(
-  //     title: title,
-  //     titleColor: AppColors.white,
-  //     message: message,
-  //     messageColor: AppColors.white,
-  //     duration: const Duration(seconds: 2),
-  //     backgroundColor: AppColors.primaryColor,
-  //     margin: const EdgeInsets.all(8),
-  //     borderRadius: BorderRadius.circular(8),
-  //     flushbarPosition: FlushbarPosition.TOP,
-  //   ).show(Get.context!);
-  // }
 }

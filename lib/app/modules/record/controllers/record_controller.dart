@@ -110,20 +110,19 @@ class RecordController extends GetxController {
   }
 
   Future<void> sendFileToApi(File file) async {
-    print('sendFileToApi');
     try {
       _showLoadingAnimation();
       var url = Uri.parse('${UrlApi.baseAPI}/audios/upload/');
       var request = http.MultipartRequest('POST', url);
       request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      request.fields['location'] = arguments['location'];
       request.headers['Authorization'] =
           'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyMzExOTUxLCJpYXQiOjE3MjA3NzU5NTEsImp0aSI6ImRkZDVhNDIyNDIyZDRiMzI5ZmViM2M3ZGRkODJkZDgxIiwidXNlcl9pZCI6MX0.6LwEnA-6yqvbpAyn8m2qtQf4kY2epRvw4RWRwTUvkRQ';
       var response = await request.send();
       if (response.statusCode < 300) {
         Get.offAllNamed(Routes.CALL_EMERGENCY);
       } else {
-        print(response.reasonPhrase);
-        Flushbar(
+        await Flushbar(
           title: 'Error',
           titleColor: AppColors.white,
           message: response.reasonPhrase,
@@ -134,11 +133,10 @@ class RecordController extends GetxController {
           borderRadius: BorderRadius.circular(8),
           flushbarPosition: FlushbarPosition.TOP,
         ).show(Get.context!);
-        // Get.offAllNamed(Routes.NAVBAR);
+        await Get.offAllNamed(Routes.NAVBAR);
       }
     } catch (e) {
-      print(e);
-      Flushbar(
+      await Flushbar(
         title: 'Error',
         titleColor: AppColors.white,
         message: e.toString(),
@@ -149,7 +147,7 @@ class RecordController extends GetxController {
         borderRadius: BorderRadius.circular(8),
         flushbarPosition: FlushbarPosition.TOP,
       ).show(Get.context!);
-      // Get.offAllNamed(Routes.NAVBAR);
+      await Get.offAllNamed(Routes.NAVBAR);
     }
   }
 
