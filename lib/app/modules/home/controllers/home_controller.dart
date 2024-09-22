@@ -57,7 +57,7 @@ class HomeController extends GetxController {
         bufferSize: 22016,
         audioLength: 44032,
         detectionThreshold: 0.85,
-        numOfInferences: 5,
+        numOfInferences: 10,
         method: 'setAudioRecognitionStream',
       );
 
@@ -77,7 +77,7 @@ class HomeController extends GetxController {
             .cast<double>();
 
         if (filteredResults.isNotEmpty) {
-          if (filteredResults[1] >= 0.85) {
+          if (filteredResults[1] >= 0.90) {
             Position position;
             try {
               position = await determinePosition();

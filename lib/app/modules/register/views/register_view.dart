@@ -243,6 +243,7 @@ class RegisterView extends GetView<RegisterController> {
                       ),
                       TextFormField(
                         controller: controller.confirmPasswordController,
+                        obscureText: true,
                         validator: (value) {
                           return controller.validateConfirmPassword(value!);
                         },
@@ -281,29 +282,36 @@ class RegisterView extends GetView<RegisterController> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryColor,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                            ),
-                            onPressed: () {
-                              controller.register(
-                                  controller.fullnameController.text,
-                                  controller.emailController.text,
-                                  controller.passwordController.text,
-                                  controller.confirmPasswordController.text);
+                      controller.isLoading.value
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primaryColor,
+                              ),
+                            )
+                          : SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
+                                  ),
+                                  onPressed: () {
+                                    controller.register(
+                                        controller.fullnameController.text,
+                                        controller.emailController.text,
+                                        controller.passwordController.text,
+                                        controller
+                                            .confirmPasswordController.text);
 
-                              FocusScope.of(context).unfocus();
-                            },
-                            child: const Text("Daftar",
-                                style: TextStyle(
-                                    color: AppColors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold))),
-                      ),
+                                    FocusScope.of(context).unfocus();
+                                  },
+                                  child: const Text("Daftar",
+                                      style: TextStyle(
+                                          color: AppColors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold))),
+                            ),
                       const SizedBox(height: 16),
                       Center(
                         child: Text.rich(

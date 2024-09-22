@@ -49,7 +49,7 @@ class OfflineController extends GetxController {
         bufferSize: 22016,
         audioLength: 44032,
         detectionThreshold: 0.95,
-        numOfInferences: 5,
+        numOfInferences: 10,
         method: 'setAudioRecognitionStream',
       );
 

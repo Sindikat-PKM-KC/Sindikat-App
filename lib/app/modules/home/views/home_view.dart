@@ -68,24 +68,13 @@ class HomeView extends GetView<HomeController> {
                     ),
                     const Text.rich(
                       TextSpan(
-                        text: 'Katakan ',
+                        text: 'Teriak sekencang mungkin ke ',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.normal,
                           color: AppColors.white,
                         ),
                         children: <InlineSpan>[
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.baseline,
-                            baseline: TextBaseline.alphabetic,
-                            child: Text(
-                              'Sindi ',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.white),
-                            ),
-                          ),
                           WidgetSpan(
                             alignment: PlaceholderAlignment.baseline,
                             baseline: TextBaseline.alphabetic,
