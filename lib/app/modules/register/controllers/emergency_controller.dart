@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sindikat_app/app/constans/colors.dart';
+import 'package:sindikat_app/app/constans/url.dart';
 import 'package:sindikat_app/app/routes/app_pages.dart';
+
+import 'package:http/http.dart' as http;
 
 class EmergencyController extends GetxController {
   var emergencyContact = Get.arguments;
@@ -17,12 +23,12 @@ class EmergencyController extends GetxController {
       tlpPenjaga3Controller;
 
   final FlutterContactPicker _contactPicker = FlutterContactPicker();
+  RxBool isLoading = false.obs;
 
   final count = 0.obs;
   @override
   void onInit() {
     super.onInit();
-    print('Emergency Contact: $emergencyContact');
     penjaga1Controller = TextEditingController();
     tlpPenjaga1Controller = TextEditingController();
     penjaga2Controller = TextEditingController();
@@ -149,18 +155,8 @@ class EmergencyController extends GetxController {
 
     if (isValid) {
       if (emergencyContact == null) {
-        Flushbar(
-          title: 'Success',
-          titleColor: AppColors.secondaryColor,
-          message: 'Contact saved successfully.',
-          messageColor: AppColors.secondaryColor,
-          duration: const Duration(seconds: 2),
-          backgroundColor: AppColors.mainBackground,
-          margin: const EdgeInsets.all(8),
-          borderRadius: BorderRadius.circular(8),
-          flushbarPosition: FlushbarPosition.TOP,
-        ).show(Get.context!);
-        Get.offAllNamed(Routes.NAVBAR);
+        addContact();
+        // Get.offAllNamed(Routes.NAVBAR);
       } else {
         Flushbar(
           title: 'Success',
@@ -176,19 +172,70 @@ class EmergencyController extends GetxController {
         Get.offNamed(Routes.NAVBAR, arguments: 1);
       }
     } else {
-      Flushbar(
-        title: 'Error',
-        titleColor: AppColors.secondaryColor,
-        message: errorMessage,
-        messageColor: AppColors.secondaryColor,
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppColors.mainBackground,
-        margin: const EdgeInsets.all(8),
-        borderRadius: BorderRadius.circular(8),
-        flushbarPosition: FlushbarPosition.TOP,
-      ).show(Get.context!);
+      _showFlushbar('Error', errorMessage, 'err');
     }
   }
 
   void increment() => count.value++;
+
+  Future<void> addContact() async {
+    isLoading.value = true;
+    final token = GetStorage().read('access_token');
+    var user = GetStorage().read('user');
+    final userId = user['id'];
+    var inputContact = [
+      {
+        'name': penjaga1Controller.text,
+        'phone_number': tlpPenjaga1Controller.text
+      },
+      {
+        'name': penjaga2Controller.text,
+        'phone_number': tlpPenjaga2Controller.text
+      },
+      {
+        'name': penjaga3Controller.text,
+        'phone_number': tlpPenjaga3Controller.text
+      }
+    ];
+    final response = await http.post(
+      Uri.parse("${UrlApi.baseAPI}/emergency-contact/$userId/register/"),
+      headers: {
+        'Authorization': "Bearer $token",
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'data': inputContact,
+      }),
+    );
+
+    isLoading.value = false;
+
+    if (response.statusCode < 300) {
+      _showFlushbar('Success', 'Contact saved successfully.', 'success');
+      Get.offAllNamed(Routes.NAVBAR); // Navigate to home or appropriate page
+    } else {
+      _showFlushbar('Error', 'Failed to save contact.', 'err');
+      print('Failed to save contact: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  }
+
+  void _showFlushbar(String title, String message, String type) {
+    Color bgColor = type == 'success'
+        ? AppColors.secondaryColor
+        : type == 'err'
+            ? AppColors.mainBackground
+            : AppColors.white;
+    Flushbar(
+      title: title,
+      titleColor: AppColors.secondaryColor,
+      message: message,
+      messageColor: AppColors.secondaryColor,
+      duration: const Duration(seconds: 2),
+      backgroundColor: bgColor,
+      margin: const EdgeInsets.all(8),
+      borderRadius: BorderRadius.circular(8),
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(Get.context!);
+  }
 }

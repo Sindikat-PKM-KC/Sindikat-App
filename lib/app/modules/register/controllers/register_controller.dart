@@ -11,7 +11,6 @@ import 'package:sindikat_app/app/modules/register/views/emergency_contact_view.d
 
 import 'package:http/http.dart' as http;
 
-
 class RegisterController extends GetxController {
   final registerFormKey = GlobalKey<FormState>();
   late TextEditingController fullnameController,
@@ -64,41 +63,74 @@ class RegisterController extends GetxController {
       String fullname, String email, String password, String confirmPassword) {
     if (registerFormKey.currentState!.validate()) {
       isLoading(true);
-        var url = Uri.parse("${UrlApi.baseAPI}/api/auth/register/");
-        var inputRegister = json.encode({
-          'name': fullname,
-          'email': email,
-          'password': password,
-          'password_confirmation': confirmPassword,
-        });
-        http.post(
-          url,
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: inputRegister,
-        ).then((res) {
-          if (res.statusCode < 300) {
-            var response = json.decode(res.body);
-            // print("response: $response");
-            var user = User.fromJson(response);
-            getStorage.write('user', user.toJson());
-            fullnameController.clear();
-            emailController.clear();
-            passwordController.clear();
-            confirmPasswordController.clear();
-            Get.offAll(() => const EmergencyContactView());
-            _showFlushbar("Success", "Berhasil daftar", "success");
-            isLoading(false);
-          } else {
-            _showFlushbar("Error", res.reasonPhrase.toString(), "err");
-            isLoading(false);
-          }
-        }).catchError((err) {
-          _showFlushbar("Error", err.toString(), "err");
+      var url = Uri.parse("${UrlApi.baseAPI}/auth/register/");
+      var inputRegister = json.encode({
+        'name': fullname,
+        'email': email,
+        'password': password,
+        'password_confirmation': confirmPassword,
+      });
+      http
+          .post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: inputRegister,
+      )
+          .then((res) {
+        if (res.statusCode < 300) {
+          login(email, password);
+          fullnameController.clear();
+          emailController.clear();
+          passwordController.clear();
+          confirmPasswordController.clear();
+          Get.offAll(() => const EmergencyContactView());
+          _showFlushbar("Success", "Berhasil daftar", "success");
           isLoading(false);
-        });
+        } else {
+          _showFlushbar("Error", res.reasonPhrase.toString(), "err");
+          isLoading(false);
+        }
+      }).catchError((err) {
+        _showFlushbar("Error", err.toString(), "err");
+        isLoading(false);
+      });
     }
+  }
+
+  Future<void> login(String email, String password) async {
+    var url = Uri.parse("${UrlApi.baseAPI}/auth/login/");
+    var inputLogin = json.encode({
+      'email': email,
+      'password': password,
+    });
+    http
+        .post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: inputLogin,
+    )
+        .then((res) {
+      if (res.statusCode < 300) {
+        var response = json.decode(res.body);
+        getStorage.write("access_token", response['access']);
+        getStorage.write("refresh_token", response['refresh']);
+        var user = User.fromJson(response['user']);
+        getStorage.write('user', user.toJson());
+        emailController.clear();
+        passwordController.clear();
+        isLoading(false);
+      } else {
+        _showFlushbar("Error", res.reasonPhrase.toString(), "err");
+        isLoading(false);
+      }
+    }).catchError((err) {
+      _showFlushbar("Error", err.toString(), "err");
+      isLoading(false);
+    });
   }
 
   void _showFlushbar(String title, String message, String type) {
