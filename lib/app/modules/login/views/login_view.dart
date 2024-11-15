@@ -13,11 +13,7 @@ class LoginView extends GetView<LoginController> {
   Widget build(BuildContext context) {
     final controller = Get.put(LoginController());
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: AppColors.mainBackground, // Set the desired color
-        statusBarIconBrightness:
-            Brightness.dark, // Set the icon color to light or dark
-      ),
+      value: systemUi(),
       child: Obx(
         () => Form(
           key: controller.loginFormKey,
@@ -34,14 +30,7 @@ class LoginView extends GetView<LoginController> {
                       SizedBox(
                         height: Get.height * 0.15,
                       ),
-                      Center(
-                        child: SizedBox(
-                            width: 75,
-                            height: 75,
-                            child: Image.asset(
-                              "assets/images/logo.png",
-                            )),
-                      ),
+                      logoSindikat(),
                       const SizedBox(
                         height: 32,
                       ),
@@ -82,46 +71,7 @@ class LoginView extends GetView<LoginController> {
                       const SizedBox(
                         height: 8,
                       ),
-                      TextFormField(
-                          controller: controller.emailController,
-                          validator: (value) {
-                            return controller.validateEmail(value!);
-                          },
-                          style: const TextStyle(
-                              color: AppColors.primaryBlack,
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal),
-                          textAlignVertical: TextAlignVertical.center,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 24),
-                            hintText: 'Masukkan email Anda',
-                            hintStyle: const TextStyle(
-                                color: AppColors.greyText,
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal),
-                            filled: true,
-                            fillColor: AppColors.white,
-                            focusColor: AppColors.mainBackground,
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.red),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.red),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: AppColors.primaryBlack, width: 2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  const BorderSide(color: AppColors.white),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          )),
+                      emailForm(controller),
                       const SizedBox(
                         height: 16,
                       ),
@@ -136,47 +86,7 @@ class LoginView extends GetView<LoginController> {
                       const SizedBox(
                         height: 8,
                       ),
-                      TextFormField(
-                        controller: controller.passwordController,
-                        validator: (value) {
-                          return controller.validatePassword(value!);
-                        },
-                        style: const TextStyle(
-                            color: AppColors.primaryBlack,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal),
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 24),
-                          hintText: 'Masukkan kata sandi Anda',
-                          hintStyle: const TextStyle(
-                              color: AppColors.greyText,
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal),
-                          filled: true,
-                          fillColor: AppColors.white,
-                          focusColor: AppColors.mainBackground,
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.red),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.red),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                                color: AppColors.primaryBlack, width: 2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: AppColors.white),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
+                      passwordForm(controller),
                       const SizedBox(height: 32),
                       controller.isLoading.value
                           ? const Center(
@@ -184,68 +94,177 @@ class LoginView extends GetView<LoginController> {
                                 color: AppColors.primaryColor,
                               ),
                             )
-                          : SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8)),
-                                ),
-                                onPressed: () {
-                                  // Get.offAllNamed(Routes.NAVBAR);
-                                  controller.login(
-                                    controller.emailController.text,
-                                    controller.passwordController.text,
-                                  );
-                                  FocusScope.of(context).unfocus();
-                                },
-                                child: const Text(
-                                  "Masuk",
-                                  style: TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
+                          : loginButton(controller, context),
                       const SizedBox(height: 16),
-                      Center(
-                        child: Text.rich(
-                          TextSpan(
-                            text: 'Belum punya akun? ',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                              color: AppColors.primaryBlack,
-                            ),
-                            children: <InlineSpan>[
-                              WidgetSpan(
-                                alignment: PlaceholderAlignment.baseline,
-                                baseline: TextBaseline.alphabetic,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Get.offAllNamed(Routes.REGISTER);
-                                  },
-                                  child: const Text(
-                                    'Daftar',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryColor),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      toRegister(),
                     ],
                   ),
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Center logoSindikat() {
+    return Center(
+      child: SizedBox(
+          width: 75,
+          height: 75,
+          child: Image.asset(
+            "assets/images/logo.png",
+          )),
+    );
+  }
+
+  Center toRegister() {
+    return Center(
+      child: Text.rich(
+        TextSpan(
+          text: 'Belum punya akun? ',
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            color: AppColors.primaryBlack,
+          ),
+          children: <InlineSpan>[
+            WidgetSpan(
+              alignment: PlaceholderAlignment.baseline,
+              baseline: TextBaseline.alphabetic,
+              child: GestureDetector(
+                onTap: () {
+                  Get.offAllNamed(Routes.REGISTER);
+                },
+                child: const Text(
+                  'Daftar',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SystemUiOverlayStyle systemUi() {
+    return const SystemUiOverlayStyle(
+      statusBarColor: AppColors.mainBackground, // Set the desired color
+      statusBarIconBrightness:
+          Brightness.dark, // Set the icon color to light or dark
+    );
+  }
+
+  TextFormField emailForm(LoginController controller) {
+    return TextFormField(
+        controller: controller.emailController,
+        validator: (value) {
+          return controller.validateEmail(value!);
+        },
+        style: const TextStyle(
+            color: AppColors.primaryBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.normal),
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+          hintText: 'Masukkan email Anda',
+          hintStyle: const TextStyle(
+              color: AppColors.greyText,
+              fontSize: 14,
+              fontWeight: FontWeight.normal),
+          filled: true,
+          fillColor: AppColors.white,
+          focusColor: AppColors.mainBackground,
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.red),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.red),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide:
+                const BorderSide(color: AppColors.primaryBlack, width: 2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: AppColors.white),
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ));
+  }
+
+  TextFormField passwordForm(LoginController controller) {
+    return TextFormField(
+      controller: controller.passwordController,
+      validator: (value) {
+        return controller.validatePassword(value!);
+      },
+      style: const TextStyle(
+          color: AppColors.primaryBlack,
+          fontSize: 14,
+          fontWeight: FontWeight.normal),
+      textAlignVertical: TextAlignVertical.center,
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+        hintText: 'Masukkan kata sandi Anda',
+        hintStyle: const TextStyle(
+            color: AppColors.greyText,
+            fontSize: 14,
+            fontWeight: FontWeight.normal),
+        filled: true,
+        fillColor: AppColors.white,
+        focusColor: AppColors.mainBackground,
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.red),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.red),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: AppColors.primaryBlack, width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: AppColors.white),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  SizedBox loginButton(LoginController controller, BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed: () {
+          // Get.offAllNamed(Routes.NAVBAR);
+          controller.login(
+            controller.emailController.text,
+            controller.passwordController.text,
+          );
+          FocusScope.of(context).unfocus();
+        },
+        child: const Text(
+          "Masuk",
+          style: TextStyle(
+              color: AppColors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold),
         ),
       ),
     );

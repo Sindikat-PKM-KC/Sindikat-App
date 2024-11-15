@@ -215,8 +215,6 @@ class EmergencyController extends GetxController {
       Get.offAllNamed(Routes.NAVBAR); // Navigate to home or appropriate page
     } else {
       _showFlushbar('Error', 'Failed to save contact.', 'err');
-      print('Failed to save contact: ${response.statusCode}');
-      print('Response body: ${response.body}');
     }
   }
 

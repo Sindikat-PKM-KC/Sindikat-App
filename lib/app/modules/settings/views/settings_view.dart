@@ -23,41 +23,9 @@ class SettingsView extends GetView<SettingsController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Pengaturan Kontak Darurat",
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
+            titleText(),
             const SizedBox(height: 4),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                onPressed: () {
-                  controller.emergencyContact();
-                  FocusScope.of(context).unfocus();
-                },
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.contact_emergency, color: AppColors.white),
-                    SizedBox(width: 16),
-                    Text("Edit Kontak Darurat",
-                        style: TextStyle(
-                            color: AppColors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ),
+            editEmergencyContact(controller, context),
             const SizedBox(height: 16),
             const Text(
               "Pengaturan Perangkat Tertaut",
@@ -68,32 +36,7 @@ class SettingsView extends GetView<SettingsController> {
               ),
             ),
             const SizedBox(height: 4),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                onPressed: () {
-                  controller.connectedDevices();
-                  FocusScope.of(context).unfocus();
-                },
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.devices_other_rounded, color: AppColors.white),
-                    SizedBox(width: 16),
-                    Text("Perangkat Tertaut",
-                        style: TextStyle(
-                            color: AppColors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ),
+            buttonAddDevices(controller, context),
           ],
         ),
       ),
@@ -103,26 +46,99 @@ class SettingsView extends GetView<SettingsController> {
                 ? const CircularProgressIndicator(
                     color: AppColors.primaryColor,
                   )
-                : SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                        onPressed: () {
-                          controller.logout();
-                          FocusScope.of(context).unfocus();
-                        },
-                        child: const Text("Keluar",
-                            style: TextStyle(
-                                color: AppColors.mainBackground,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold))),
-                  ),
+                : logoutButton(controller, context),
           )),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  SizedBox logoutButton(SettingsController controller, BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryColor,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          onPressed: () {
+            controller.logout();
+            FocusScope.of(context).unfocus();
+          },
+          child: const Text("Keluar",
+              style: TextStyle(
+                  color: AppColors.mainBackground,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold))),
+    );
+  }
+
+  SizedBox buttonAddDevices(
+      SettingsController controller, BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed: () {
+          controller.connectedDevices();
+          FocusScope.of(context).unfocus();
+        },
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.devices_other_rounded, color: AppColors.white),
+            SizedBox(width: 16),
+            Text("Perangkat Tertaut",
+                style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SizedBox editEmergencyContact(
+      SettingsController controller, BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed: () {
+          controller.emergencyContact();
+          FocusScope.of(context).unfocus();
+        },
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.contact_emergency, color: AppColors.white),
+            SizedBox(width: 16),
+            Text("Edit Kontak Darurat",
+                style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Text titleText() {
+    return const Text(
+      "Pengaturan Kontak Darurat",
+      style: TextStyle(
+        color: AppColors.white,
+        fontSize: 12,
+        fontWeight: FontWeight.normal,
+      ),
     );
   }
 }
