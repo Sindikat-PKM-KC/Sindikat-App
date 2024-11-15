@@ -12,11 +12,7 @@ class RecordView extends GetView<RecordController> {
   Widget build(BuildContext context) {
     final controller = Get.put(RecordController());
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: AppColors.secondaryColor, // Set the desired color
-        statusBarIconBrightness:
-            Brightness.light, // Set the icon color to light or dark
-      ),
+      value: sytemUi(),
       child: Scaffold(
         backgroundColor: AppColors.secondaryColor,
         body: SafeArea(
@@ -25,26 +21,8 @@ class RecordView extends GetView<RecordController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Center(
-                  child: Text(
-                    "SINDIKAT User",
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Center(
-                  child: Text(
-                    "Kata Sindi Terdeteksi",
-                    style: TextStyle(
-                      color: AppColors.primaryColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                openerMessage(),
+                warningText(),
                 const SizedBox(height: 54),
                 const Text(
                   "Pendeteksi Suara",
@@ -63,27 +41,69 @@ class RecordView extends GetView<RecordController> {
                     color: AppColors.primaryColor,
                   ),
                 ),
-                const Text(
-                  "Suara akan direkam selama 4 detik. Jika suara terdeteksi sebagai potensi kriminal maka  panggilan akan diteruskan dan pesan akan dikirimkan ke kontak darurat. Alarm akan dibunyikan setelah panggilan diteruskan",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
+                commandText(),
                 const SizedBox(height: 72),
-                SizedBox(
-                  width: double.infinity,
-                  child: Lottie.asset(
-                    'assets/lottie/listen_audio_1.json',
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                animationWave(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  SizedBox animationWave() {
+    return SizedBox(
+      width: double.infinity,
+      child: Lottie.asset(
+        'assets/lottie/listen_audio_1.json',
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+
+  Text commandText() {
+    return const Text(
+      "Suara akan direkam selama 4 detik. Jika suara terdeteksi sebagai potensi kriminal maka  panggilan akan diteruskan dan pesan akan dikirimkan ke kontak darurat. Alarm akan dibunyikan setelah panggilan diteruskan",
+      style: TextStyle(
+        color: AppColors.white,
+        fontSize: 12,
+        fontWeight: FontWeight.normal,
+      ),
+    );
+  }
+
+  Center warningText() {
+    return const Center(
+      child: Text(
+        "Status Waspada Terdeteksi",
+        style: TextStyle(
+          color: AppColors.primaryColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Center openerMessage() {
+    return const Center(
+      child: Text(
+        "SINDIKAT",
+        style: TextStyle(
+          color: AppColors.white,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  SystemUiOverlayStyle sytemUi() {
+    return const SystemUiOverlayStyle(
+      statusBarColor: AppColors.secondaryColor, // Set the desired color
+      statusBarIconBrightness:
+          Brightness.light, // Set the icon color to light or dark
     );
   }
 }
